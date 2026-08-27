@@ -1,11 +1,9 @@
 package com.arcmanager.domain.usecase
 
-import com.arcmanager.core.util.DateUtils
 import com.arcmanager.core.util.Result
 import com.arcmanager.domain.model.*
 import com.arcmanager.domain.repository.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -38,54 +36,72 @@ class GetDashboardOverviewUseCase @Inject constructor(
     operator fun invoke(): Flow<Result<DashboardOverview>> = flow {
         emit(Result.Loading)
         try {
-            // 1. Total received
-            val totalReceived = paymentRepository.getTotalReceived().getOrNull() ?: BigDecimal.ZERO
-            val receivedThisMonth = paymentRepository.getTotalReceivedThisMonth().getOrNull() ?: BigDecimal.ZERO
+            // 1. Financial Totals
+            val totalReceived = try {
+                paymentRepository.getTotalReceived().getOrNull() ?: BigDecimal.ZERO
+            } catch (e: Exception) { BigDecimal.ZERO }
 
-            // 2. Fetch active clients & projects to calculate pending totals
-            var allClients = emptyList<Client>()
-            clientRepository.getClients("active").collect { result ->
-                if (result is Result.Success) allClients = result.data
-            }
+            val receivedThisMonth = try {
+                paymentRepository.getTotalReceivedThisMonth().getOrNull() ?: BigDecimal.ZERO
+            } catch (e: Exception) { BigDecimal.ZERO }
 
-            var allProjects = emptyList<Project>()
-            projectRepository.getAllProjects().collect { result ->
-                if (result is Result.Success) allProjects = result.data
-            }
-
-            // Calculate pending totals accurately across all projects
+            // 2. Fetch Projects for Total Value & Pending
             var totalProjectValue = BigDecimal.ZERO
-            allProjects.forEach { project ->
-                totalProjectValue = totalProjectValue.add(project.totalAmount)
-            }
+            var activeProjects = 0
+            try {
+                projectRepository.getAllProjects().collect { result ->
+                    if (result is Result.Success) {
+                        activeProjects = result.data.count { it.status == "active" }
+                        result.data.forEach { project ->
+                            totalProjectValue = totalProjectValue.add(project.totalAmount)
+                        }
+                    }
+                }
+            } catch (e: Exception) { /* continue with defaults */ }
+
             val totalPending = totalProjectValue.subtract(totalReceived).coerceAtLeast(BigDecimal.ZERO)
 
-            // 3. Fetch upcoming & overdue schedules
+            // 3. Active Clients Count
+            var activeClients = 0
+            try {
+                clientRepository.getClients("active").collect { result ->
+                    if (result is Result.Success) activeClients = result.data.size
+                }
+            } catch (e: Exception) { /* continue */ }
+
+            // 4. Schedules (Upcoming & Overdue)
             var upcoming = emptyList<PaymentSchedule>()
-            scheduleRepository.getUpcomingSchedules(5).collect { result ->
-                if (result is Result.Success) upcoming = result.data
-            }
+            try {
+                scheduleRepository.getUpcomingSchedules(5).collect { result ->
+                    if (result is Result.Success) upcoming = result.data
+                }
+            } catch (e: Exception) { /* continue */ }
 
             var overdue = emptyList<PaymentSchedule>()
-            scheduleRepository.getOverdueSchedules().collect { result ->
-                if (result is Result.Success) overdue = result.data
-            }
-
             var overdueTotal = BigDecimal.ZERO
-            overdue.forEach { overdueTotal = overdueTotal.add(it.remainingAmount) }
+            try {
+                scheduleRepository.getOverdueSchedules().collect { result ->
+                    if (result is Result.Success) {
+                        overdue = result.data
+                        overdue.forEach { overdueTotal = overdueTotal.add(it.remainingAmount) }
+                    }
+                }
+            } catch (e: Exception) { /* continue */ }
 
-            // 4. Calculate expected this month
+            // 5. Expected this month
             val currentMonth = LocalDate.now(ZoneId.of("Asia/Kolkata")).monthValue
             val currentYear = LocalDate.now(ZoneId.of("Asia/Kolkata")).year
             var expectedThisMonth = BigDecimal.ZERO
             upcoming.filter { it.dueDate.monthValue == currentMonth && it.dueDate.year == currentYear }
                 .forEach { expectedThisMonth = expectedThisMonth.add(it.remainingAmount) }
 
-            // 5. Recent payments
+            // 6. Recent Payments
             var recent = emptyList<Payment>()
-            paymentRepository.getRecentPayments(10).collect { result ->
-                if (result is Result.Success) recent = result.data
-            }
+            try {
+                paymentRepository.getRecentPayments(10).collect { result ->
+                    if (result is Result.Success) recent = result.data
+                }
+            } catch (e: Exception) { /* continue */ }
 
             val overview = DashboardOverview(
                 totalReceived = totalReceived,
@@ -93,9 +109,9 @@ class GetDashboardOverviewUseCase @Inject constructor(
                 expectedThisMonth = expectedThisMonth,
                 receivedThisMonth = receivedThisMonth,
                 totalOverdue = overdueTotal,
-                activeClientsCount = allClients.size,
-                activeProjectsCount = allProjects.filter { it.status == "active" }.size,
-                recurringMonthlyRevenue = BigDecimal.ZERO, // Populated in recurring phase
+                activeClientsCount = activeClients,
+                activeProjectsCount = activeProjects,
+                recurringMonthlyRevenue = BigDecimal.ZERO,
                 upcomingPayments = upcoming,
                 recentTransactions = recent,
                 overduePayments = overdue,
@@ -103,13 +119,13 @@ class GetDashboardOverviewUseCase @Inject constructor(
 
             emit(Result.Success(overview))
         } catch (e: Exception) {
-            emit(Result.Error("Failed to calculate dashboard metrics: ${e.message}", e))
+            emit(Result.Error("Dashboard load failed: ${e.message}", e))
         }
     }
 }
 
 // ──────────────────────────────────────────────
-// Client UseCases
+// Client UseCases (Fast, Non-blocking Calculation)
 // ──────────────────────────────────────────────
 class GetClientsWithCalculationsUseCase @Inject constructor(
     private val clientRepository: ClientRepository,
@@ -118,27 +134,57 @@ class GetClientsWithCalculationsUseCase @Inject constructor(
 ) {
     operator fun invoke(status: String? = null): Flow<Result<List<Client>>> = flow {
         emit(Result.Loading)
-        clientRepository.getClients(status).collect { clientResult ->
-            if (clientResult is Result.Success) {
-                val enrichedClients = clientResult.data.map { client ->
-                    val totalReceived = paymentRepository.getTotalReceivedByClient(client.id).getOrNull() ?: BigDecimal.ZERO
-                    client.totalReceived = totalReceived
-                    // Calculate total billed from client's projects
-                    var totalBilled = BigDecimal.ZERO
-                    projectRepository.getProjectsByClient(client.id).collect { projResult ->
-                        if (projResult is Result.Success) {
-                            projResult.data.forEach { totalBilled = totalBilled.add(it.totalAmount) }
-                            client.activeProjects = projResult.data.count { it.status == "active" }
+        try {
+            clientRepository.getClients(status).collect { clientResult ->
+                when (clientResult) {
+                    is Result.Loading -> emit(Result.Loading)
+                    is Result.Error -> emit(clientResult)
+                    is Result.Success -> {
+                        val clients = clientResult.data
+                        if (clients.isEmpty()) {
+                            emit(Result.Success(emptyList()))
+                            return@collect
                         }
+
+                        // Load projects in batch to enrich clients synchronously
+                        var allProjects = emptyList<Project>()
+                        try {
+                            projectRepository.getAllProjects().collect { pRes ->
+                                if (pRes is Result.Success) allProjects = pRes.data
+                            }
+                        } catch (e: Exception) { /* fallback to empty */ }
+
+                        // Load payments in batch
+                        var allPayments = emptyList<Payment>()
+                        try {
+                            paymentRepository.getAllPayments().collect { payRes ->
+                                if (payRes is Result.Success) allPayments = payRes.data
+                            }
+                        } catch (e: Exception) { /* fallback to empty */ }
+
+                        val enrichedClients = clients.map { client ->
+                            val clientProjects = allProjects.filter { it.clientId == client.id }
+                            val clientPayments = allPayments.filter { it.clientId == client.id && it.status == "received" }
+
+                            var totalBilled = BigDecimal.ZERO
+                            clientProjects.forEach { totalBilled = totalBilled.add(it.totalAmount) }
+
+                            var totalReceived = BigDecimal.ZERO
+                            clientPayments.forEach { totalReceived = totalReceived.add(it.amount) }
+
+                            client.totalBilled = totalBilled
+                            client.totalReceived = totalReceived
+                            client.totalPending = totalBilled.subtract(totalReceived).coerceAtLeast(BigDecimal.ZERO)
+                            client.activeProjects = clientProjects.count { it.status == "active" }
+                            client
+                        }
+
+                        emit(Result.Success(enrichedClients))
                     }
-                    client.totalBilled = totalBilled
-                    client.totalPending = totalBilled.subtract(totalReceived).coerceAtLeast(BigDecimal.ZERO)
-                    client
                 }
-                emit(Result.Success(enrichedClients))
-            } else if (clientResult is Result.Error) {
-                emit(clientResult)
             }
+        } catch (e: Exception) {
+            emit(Result.Error("Failed to load clients: ${e.message}", e))
         }
     }
 }
@@ -150,7 +196,6 @@ class SaveProjectScheduleUseCase @Inject constructor(
     private val scheduleRepository: PaymentScheduleRepository,
 ) {
     suspend operator fun invoke(projectId: String, schedules: List<PaymentSchedule>): Result<List<PaymentSchedule>> {
-        // Delete existing draft schedules for project before saving new plan
         scheduleRepository.deleteSchedulesByProject(projectId)
         return scheduleRepository.createSchedules(schedules)
     }

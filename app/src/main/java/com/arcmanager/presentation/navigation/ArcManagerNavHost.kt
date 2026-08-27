@@ -12,11 +12,16 @@ import androidx.navigation.navArgument
 import com.arcmanager.presentation.screens.auth.ForgotPasswordScreen
 import com.arcmanager.presentation.screens.auth.LoginScreen
 import com.arcmanager.presentation.screens.auth.RegisterScreen
+import com.arcmanager.presentation.screens.bank.AddBankAccountScreen
+import com.arcmanager.presentation.screens.bank.BankAccountsScreen
 import com.arcmanager.presentation.screens.clients.AddClientScreen
 import com.arcmanager.presentation.screens.clients.ClientDetailScreen
 import com.arcmanager.presentation.screens.clients.ClientsScreen
 import com.arcmanager.presentation.screens.dashboard.DashboardScreen
 import com.arcmanager.presentation.screens.main.MainScreen
+import com.arcmanager.presentation.screens.more.AnalyticsScreen
+import com.arcmanager.presentation.screens.more.EditProfileScreen
+import com.arcmanager.presentation.screens.more.PaymentCalendarScreen
 import com.arcmanager.presentation.screens.payments.AddPaymentScreen
 import com.arcmanager.presentation.screens.payments.PaymentDetailScreen
 import com.arcmanager.presentation.screens.payments.PaymentScheduleBuilderScreen
@@ -24,14 +29,6 @@ import com.arcmanager.presentation.screens.payments.PaymentsScreen
 import com.arcmanager.presentation.screens.projects.CreateProjectScreen
 import com.arcmanager.presentation.screens.projects.ProjectDetailScreen
 import com.arcmanager.presentation.screens.splash.SplashScreen
-
-// ──────────────────────────────────────────────
-// Liquid Spatial Spring Transitions
-// ──────────────────────────────────────────────
-private val springSpec = spring<Float>(
-    dampingRatio = Spring.DampingRatioLowBouncy,
-    stiffness = Spring.StiffnessMediumLow
-)
 
 @Composable
 fun ArcManagerNavHost(
@@ -41,30 +38,26 @@ fun ArcManagerNavHost(
         navController = navController,
         startDestination = Screen.Splash.route,
         enterTransition = {
-            fadeIn(animationSpec = tween(350, easing = FastOutSlowInEasing)) +
+            fadeIn(animationSpec = tween(220, easing = FastOutSlowInEasing)) +
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.Start,
-                    animationSpec = tween(400, easing = FastOutSlowInEasing),
-                    initialOffset = { (it * 0.25f).toInt() }
-                ) +
-                scaleIn(initialScale = 0.94f, animationSpec = tween(400, easing = FastOutSlowInEasing))
+                    animationSpec = tween(250, easing = FastOutSlowInEasing),
+                    initialOffset = { (it * 0.15f).toInt() }
+                )
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(250, easing = FastOutLinearInEasing)) +
-                scaleOut(targetScale = 0.96f, animationSpec = tween(300, easing = FastOutLinearInEasing))
+            fadeOut(animationSpec = tween(180, easing = FastOutLinearInEasing))
         },
         popEnterTransition = {
-            fadeIn(animationSpec = tween(350, easing = FastOutSlowInEasing)) +
+            fadeIn(animationSpec = tween(220, easing = FastOutSlowInEasing)) +
                 slideIntoContainer(
                     towards = AnimatedContentTransitionScope.SlideDirection.End,
-                    animationSpec = tween(400, easing = FastOutSlowInEasing),
-                    initialOffset = { (-it * 0.25f).toInt() }
-                ) +
-                scaleIn(initialScale = 0.96f, animationSpec = tween(400, easing = FastOutSlowInEasing))
+                    animationSpec = tween(250, easing = FastOutSlowInEasing),
+                    initialOffset = { (-it * 0.15f).toInt() }
+                )
         },
         popExitTransition = {
-            fadeOut(animationSpec = tween(250, easing = FastOutLinearInEasing)) +
-                scaleOut(targetScale = 0.92f, animationSpec = tween(300, easing = FastOutLinearInEasing))
+            fadeOut(animationSpec = tween(180, easing = FastOutLinearInEasing))
         }
     ) {
         // ── Auth ──
@@ -112,7 +105,7 @@ fun ArcManagerNavHost(
             )
         }
 
-        // ── Main App (Bottom Dock) ──
+        // ── Main App (Bottom Dock Tabs) ──
         composable(Screen.Dashboard.route) {
             MainScreen(navController = navController, currentRoute = Screen.Dashboard.route)
         }
@@ -243,6 +236,40 @@ fun ArcManagerNavHost(
             val paymentId = backStackEntry.arguments?.getString("paymentId") ?: return@composable
             PaymentDetailScreen(
                 paymentId = paymentId,
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // ── Bank Accounts ──
+        composable(Screen.BankAccounts.route) {
+            BankAccountsScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToAddAccount = { navController.navigate(Screen.AddBankAccount.route) }
+            )
+        }
+
+        composable(Screen.AddBankAccount.route) {
+            AddBankAccountScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onAccountAdded = { navController.popBackStack() }
+            )
+        }
+
+        // ── Analytics & Calendar & Profile ──
+        composable(Screen.Analytics.route) {
+            AnalyticsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Calendar.route) {
+            PaymentCalendarScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Profile.route) {
+            EditProfileScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

@@ -40,6 +40,10 @@ fun ClientsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.loadClients()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

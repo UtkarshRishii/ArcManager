@@ -49,6 +49,10 @@ fun DashboardScreen(
     val overview = uiState.overview
     val currency = uiState.user?.defaultCurrency ?: "INR"
 
+    LaunchedEffect(Unit) {
+        viewModel.loadDashboard()
+    }
+
     if (uiState.isLoading && overview.totalReceived == BigDecimal.ZERO) {
         LoadingState(message = "Calculating financial overview...")
         return
@@ -85,7 +89,7 @@ fun DashboardScreen(
                     )
                 }
 
-                // Liquid Frosted Avatar
+                // Liquid Frosted Avatar (Clickable to Edit Profile)
                 Box(
                     modifier = Modifier
                         .size(46.dp)
@@ -98,7 +102,8 @@ fun DashboardScreen(
                                 listOf(Color.White.copy(alpha = 0.6f), PrimaryVioletLight.copy(alpha = 0.3f))
                             ),
                             shape = CircleShape
-                        ),
+                        )
+                        .clickable { navController.navigate(Screen.Profile.route) },
                     contentAlignment = Alignment.Center
                 ) {
                     val initial = uiState.user?.fullName?.take(1)?.uppercase() ?: "U"

@@ -18,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -42,6 +41,12 @@ fun MoreScreen(
 ) {
     val authState by authViewModel.uiState.collectAsStateWithLifecycle()
     var showLogoutConfirm by remember { mutableStateOf(false) }
+    var showSecurityInfo by remember { mutableStateOf(false) }
+    var showRetainersInfo by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        authViewModel.checkSession()
+    }
 
     if (showLogoutConfirm) {
         ConfirmDialog(
@@ -57,6 +62,62 @@ fun MoreScreen(
                 }
             },
             onDismiss = { showLogoutConfirm = false }
+        )
+    }
+
+    if (showSecurityInfo) {
+        AlertDialog(
+            onDismissRequest = { showSecurityInfo = false },
+            title = { Text("Security & Data Protection", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = TextPrimary) },
+            text = {
+                Text(
+                    "• Bank account numbers and IFSC details are encrypted using Android Keystore AES-GCM.\n• All database rows are strictly scoped by Supabase Row-Level Security.\n• Only the last 4 digits of accounts are displayed on screen.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { showSecurityInfo = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryViolet)
+                ) {
+                    Text("OK", color = Color.White)
+                }
+            },
+            containerColor = DarkSurfaceElevated,
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
+
+    if (showRetainersInfo) {
+        AlertDialog(
+            onDismissRequest = { showRetainersInfo = false },
+            title = { Text("Recurring Retainers", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = TextPrimary) },
+            text = {
+                Text(
+                    "You can create monthly recurring projects when creating a new project. Select 'Monthly Recurring' under Payment Plan Model to generate recurring milestone billing.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showRetainersInfo = false
+                        navController.navigate(Screen.CreateProject.createRoute())
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryViolet)
+                ) {
+                    Text("+ Create Recurring Project", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRetainersInfo = false }) {
+                    Text("Close", color = TextSecondary)
+                }
+            },
+            containerColor = DarkSurfaceElevated,
+            shape = RoundedCornerShape(20.dp)
         )
     }
 
@@ -79,9 +140,12 @@ fun MoreScreen(
             )
         }
 
-        // Profile Card with Liquid Glass Aura
+        // Profile Card with Liquid Glass Aura (Clickable)
         item {
-            UserProfileLiquidCard(user = authState.user)
+            UserProfileLiquidCard(
+                user = authState.user,
+                onClick = { navController.navigate(Screen.Profile.route) }
+            )
         }
 
         // Hub Navigation Items Capsule
@@ -104,35 +168,35 @@ fun MoreScreen(
                         icon = Icons.Outlined.AccountBalance,
                         title = "Bank Accounts",
                         subtitle = "Track personal bank receiving accounts",
-                        onClick = { /* Bank accounts */ }
+                        onClick = { navController.navigate(Screen.BankAccounts.route) }
                     )
                     HorizontalDivider(color = Color(0x12FFFFFF), modifier = Modifier.padding(horizontal = 16.dp))
                     MoreMenuItem(
                         icon = Icons.Outlined.Repeat,
                         title = "Recurring Retainers",
                         subtitle = "Monthly and periodic recurring billing",
-                        onClick = { /* Recurring */ }
+                        onClick = { showRetainersInfo = true }
                     )
                     HorizontalDivider(color = Color(0x12FFFFFF), modifier = Modifier.padding(horizontal = 16.dp))
                     MoreMenuItem(
                         icon = Icons.Outlined.BarChart,
                         title = "Analytics & Cash Flow",
-                        subtitle = "Financial breakdown & income forecast",
-                        onClick = { /* Analytics */ }
+                        subtitle = "Financial breakdown & collection efficiency",
+                        onClick = { navController.navigate(Screen.Analytics.route) }
                     )
                     HorizontalDivider(color = Color(0x12FFFFFF), modifier = Modifier.padding(horizontal = 16.dp))
                     MoreMenuItem(
                         icon = Icons.Outlined.CalendarMonth,
                         title = "Payment Calendar",
-                        subtitle = "Monthly due dates & schedule view",
-                        onClick = { /* Calendar */ }
+                        subtitle = "Monthly due dates & milestone schedule",
+                        onClick = { navController.navigate(Screen.Calendar.route) }
                     )
                     HorizontalDivider(color = Color(0x12FFFFFF), modifier = Modifier.padding(horizontal = 16.dp))
                     MoreMenuItem(
                         icon = Icons.Outlined.Security,
-                        title = "Security & Biometrics",
-                        subtitle = "App lock & Keystore data encryption",
-                        onClick = { /* Security */ }
+                        title = "Security & Encryption",
+                        subtitle = "Keystore AES-GCM & Row-Level Security",
+                        onClick = { showSecurityInfo = true }
                     )
                 }
             }
@@ -175,7 +239,10 @@ fun MoreScreen(
 }
 
 @Composable
-private fun UserProfileLiquidCard(user: User?) {
+private fun UserProfileLiquidCard(
+    user: User?,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -189,45 +256,59 @@ private fun UserProfileLiquidCard(user: User?) {
                 ),
                 shape = RoundedCornerShape(22.dp)
             )
+            .clickable(onClick = onClick)
             .padding(20.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(PrimaryVioletSubtle)
-                    .border(2.dp, PrimaryVioletBright, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                val initial = user?.fullName?.take(1)?.uppercase() ?: "U"
-                Text(
-                    text = initial,
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = PrimaryVioletBright
-                )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(PrimaryVioletSubtle)
+                        .border(2.dp, PrimaryVioletBright, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    val initial = user?.fullName?.take(1)?.uppercase() ?: "U"
+                    Text(
+                        text = initial,
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        color = PrimaryVioletBright
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(18.dp))
+
+                Column {
+                    Text(
+                        text = user?.fullName ?: "User Profile",
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                        color = TextPrimary
+                    )
+                    Text(
+                        text = user?.email ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Currency: ${user?.defaultCurrency ?: "INR"} • Tap to Edit",
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                        color = PrimaryVioletBright
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.width(18.dp))
-
-            Column {
-                Text(
-                    text = user?.fullName ?: "User",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = TextPrimary
-                )
-                Text(
-                    text = user?.email ?: "",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "Default Currency: ${user?.defaultCurrency ?: "INR"}",
-                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
-                    color = PrimaryVioletLight
-                )
-            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                contentDescription = "Edit Profile",
+                tint = TextTertiary,
+                modifier = Modifier.size(16.dp)
+            )
         }
     }
 }
@@ -240,7 +321,6 @@ private fun MoreMenuItem(
     onClick: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
 
     Row(
         modifier = Modifier

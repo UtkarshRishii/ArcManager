@@ -131,6 +131,10 @@ fun ClientDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val client = uiState.client
 
+    androidx.compose.runtime.LaunchedEffect(clientId) {
+        viewModel.loadClient()
+    }
+
     if (uiState.isLoading || client == null) {
         LoadingState(message = "Loading client details...")
         return

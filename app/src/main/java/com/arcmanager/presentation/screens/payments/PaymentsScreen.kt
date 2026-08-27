@@ -41,6 +41,10 @@ fun PaymentsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        viewModel.loadPayments()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
