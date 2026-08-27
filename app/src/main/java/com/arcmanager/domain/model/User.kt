@@ -6,7 +6,7 @@ data class User(
     val id: String,
     val fullName: String?,
     val email: String?,
-    val avatarUrl: String?,
+    val avatarUrl: String? = null,
     val defaultCurrency: String = "INR",
     val timezone: String = "Asia/Kolkata",
     val createdAt: Instant? = null,

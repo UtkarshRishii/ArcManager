@@ -1,50 +1,56 @@
-name: Build ArcManager APK
+name: Build ArcManager Debug APK
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  build-apk:
-    name: Build Debug APK
+  build:
+    name: Build & Package APK
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
-          distribution: temurin
           java-version: '17'
-          cache: gradle
+          distribution: 'temurin'
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Set up Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
-      - name: Build Debug APK
-        run: gradle --no-daemon :app:assembleDebug
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: Verify APK
+      - name: Build Debug APK with Gradle
+        run: ./gradlew :app:assembleDebug --stacktrace
+
+      - name: Verify APK Generated
         run: |
-          test -f app/build/outputs/apk/debug/app-debug.apk
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
+          ls -la app/build/outputs/apk/debug/
+          if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "Error: APK was not generated at expected path!"
+            exit 1
+          fi
 
-      - name: Upload APK
+      - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ArcManager-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30

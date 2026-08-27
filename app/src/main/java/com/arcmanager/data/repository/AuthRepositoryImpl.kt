@@ -31,28 +31,20 @@ class AuthRepositoryImpl @Inject constructor(
                 this.password = password
             }
 
-            when (val result = getCurrentUser()) {
+            when (val userResult = getCurrentUser()) {
                 is Result.Success -> {
-                    result.data?.let {
-                        Result.success(it)
-                    } ?: Result.error(
-                        "Login succeeded but user profile was not found"
-                    )
+                    val user = userResult.data
+                    if (user != null) {
+                        Result.success(user)
+                    } else {
+                        Result.error("Login succeeded but user profile was not found")
+                    }
                 }
-
-                is Result.Error -> {
-                    Result.error(result.message, result.exception)
-                }
-
-                is Result.Loading -> {
-                    Result.error("Unable to load user")
-                }
+                is Result.Error -> Result.error(userResult.message, userResult.exception)
+                is Result.Loading -> Result.error("Unable to load user")
             }
         } catch (e: Exception) {
-            Result.error(
-                "Login failed: ${e.message}",
-                e
-            )
+            Result.error("Login failed: ${e.message}", e)
         }
     }
 
@@ -68,41 +60,31 @@ class AuthRepositoryImpl @Inject constructor(
             }
 
             val userId = supabase.auth.currentUserOrNull()?.id
-                ?: return@withContext Result.error(
-                    "Registration failed"
-                )
+                ?: return@withContext Result.error("Registration failed")
 
             val profile = ProfileDto(
                 id = userId,
                 fullName = fullName,
                 email = email,
-                avatarUrl = null
+                avatarUrl = null,
             )
 
             supabase.postgrest["profiles"].insert(profile)
 
-            when (val result = getCurrentUser()) {
+            when (val userResult = getCurrentUser()) {
                 is Result.Success -> {
-                    result.data?.let {
-                        Result.success(it)
-                    } ?: Result.error(
-                        "Registration succeeded but user profile was not found"
-                    )
+                    val user = userResult.data
+                    if (user != null) {
+                        Result.success(user)
+                    } else {
+                        Result.error("Registration succeeded but user profile was not found")
+                    }
                 }
-
-                is Result.Error -> {
-                    Result.error(result.message, result.exception)
-                }
-
-                is Result.Loading -> {
-                    Result.error("Unable to load user")
-                }
+                is Result.Error -> Result.error(userResult.message, userResult.exception)
+                is Result.Loading -> Result.error("Unable to load user")
             }
         } catch (e: Exception) {
-            Result.error(
-                "Registration failed: ${e.message}",
-                e
-            )
+            Result.error("Registration failed: ${e.message}", e)
         }
     }
 
@@ -113,59 +95,48 @@ class AuthRepositoryImpl @Inject constructor(
             supabase.auth.resetPasswordForEmail(email)
             Result.success(Unit)
         } catch (e: Exception) {
-            Result.error(
-                "Failed to send reset email: ${e.message}",
-                e
-            )
+            Result.error("Failed to send reset email: ${e.message}", e)
         }
     }
 
-    override suspend fun logout(): Result<Unit> =
-        withContext(dispatcher) {
-            try {
-                supabase.auth.signOut()
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Result.error(
-                    "Logout failed: ${e.message}",
-                    e
-                )
-            }
+    override suspend fun logout(): Result<Unit> = withContext(dispatcher) {
+        try {
+            supabase.auth.signOut()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.error("Logout failed: ${e.message}", e)
         }
+    }
 
-    override suspend fun getCurrentUser(): Result<User?> =
-        withContext(dispatcher) {
-            try {
-                val authUser = supabase.auth.currentUserOrNull()
-                    ?: return@withContext Result.success(null)
+    override suspend fun getCurrentUser(): Result<User?> = withContext(dispatcher) {
+        try {
+            val authUser = supabase.auth.currentUserOrNull()
+                ?: return@withContext Result.success(null)
 
-                val profile = supabase.postgrest["profiles"]
-                    .select {
-                        filter {
-                            eq("id", authUser.id)
-                        }
+            val profile = supabase.postgrest["profiles"]
+                .select {
+                    filter {
+                        eq("id", authUser.id)
                     }
-                    .decodeSingleOrNull<ProfileDto>()
-
-                if (profile != null) {
-                    Result.success(profile.toDomain())
-                } else {
-                    Result.success(
-                        User(
-                            id = authUser.id,
-                            fullName = null,
-                            email = authUser.email,
-                            avatarUrl = null,
-                        )
-                    )
                 }
-            } catch (e: Exception) {
-                Result.error(
-                    "Failed to get user: ${e.message}",
-                    e
+                .decodeSingleOrNull<ProfileDto>()
+
+            if (profile != null) {
+                Result.success(profile.toDomain())
+            } else {
+                Result.success(
+                    User(
+                        id = authUser.id,
+                        fullName = null,
+                        email = authUser.email,
+                        avatarUrl = null,
+                    )
                 )
             }
+        } catch (e: Exception) {
+            Result.error("Failed to get user: ${e.message}", e)
         }
+    }
 
     override suspend fun isLoggedIn(): Boolean {
         return try {
@@ -197,10 +168,7 @@ class AuthRepositoryImpl @Inject constructor(
 
             Result.success(user)
         } catch (e: Exception) {
-            Result.error(
-                "Failed to update profile: ${e.message}",
-                e
-            )
+            Result.error("Failed to update profile: ${e.message}", e)
         }
     }
 }

@@ -466,4 +466,27 @@ fun ConfirmDialog(
             }
         }
     )
+// ──────────────────────────────────────────────
+// 9. Financial Metric Mini (Compact summary display)
+// ──────────────────────────────────────────────
+@Composable
+fun FinancialMetricMini(
+    label: String,
+    amount: BigDecimal,
+    currency: String,
+    color: Color = TextPrimary,
+) {
+    Column {
+        Text(
+            text = label.uppercase(),
+            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+            color = TextTertiary
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = CurrencyUtils.formatAmount(amount, currency),
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            color = color
+        )
+    }
 }
