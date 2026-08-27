@@ -1,0 +1,6 @@
+# Enforce LF on gradlew script for Unix runners
+gradlew text eol=lf
+*.sh text eol=lf
+
+# Auto-detect text files
+* text=auto
