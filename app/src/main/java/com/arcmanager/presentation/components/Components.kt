@@ -466,6 +466,8 @@ fun ConfirmDialog(
             }
         }
     )
+}
+
 // ──────────────────────────────────────────────
 // 9. Financial Metric Mini (Compact summary display)
 // ──────────────────────────────────────────────
