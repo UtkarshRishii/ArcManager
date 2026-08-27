@@ -1,0 +1,2398 @@
+Product Name
+
+ArcManager
+Personal Client Payment & Finance Manager
+
+You can rename it later to whatever you want.
+
+Product Goal
+
+Build a secure personal finance-management application for tracking money received from clients, outstanding/pending payments, recurring payments, project-wise billing, payment schedules, and which personal bank account received each transaction.
+
+The app is not a banking application and should not attempt to directly move money. It is a private bookkeeping/receivables-management system.
+
+2. Core User Flow
+
+The primary flow should be:
+
+Add Client
+     ↓
+Create Project / Contract
+     ↓
+Set Payment Plan
+     ↓
+Add Advance / Payment
+     ↓
+Track Remaining Balance
+     ↓
+Track Upcoming Payments
+     ↓
+Receive Money
+     ↓
+Record Transaction + Bank Account
+     ↓
+Dashboard Automatically Updates
+
+Example:
+
+Client: ABC Technologies
+
+Project:
+Falcon Android App
+
+Total Project Value:
+₹50,000
+
+Payment Plan:
+₹15,000 Advance
+₹20,000 Milestone
+₹15,000 Final
+
+Received:
+₹35,000
+
+Pending:
+₹15,000
+
+Status:
+PARTIALLY PAID
+3. Payment Models
+
+The app must support:
+
+One-Time
+Project Value: ₹30,000
+
+Payment:
+₹30,000
+
+Status → Paid
+Advance + Remaining
+Project: ₹50,000
+
+Advance: ₹15,000
+Remaining: ₹35,000
+Installments
+₹60,000
+
+1. ₹20,000 — Paid
+2. ₹20,000 — Paid
+3. ₹20,000 — Pending
+Monthly Recurring
+₹5,000/month
+
+September → Pending
+October → Upcoming
+November → Upcoming
+Custom Schedule
+
+Allow:
+
+₹10,000 — 01 Sep
+₹15,000 — 15 Sep
+₹25,000 — 01 Oct
+4. Dashboard
+
+The dashboard is the home screen.
+
+Header
+Good evening, Utkarsh
+
+Your financial overview
+Main Cards
+TOTAL RECEIVED
+₹1,24,500
+
+PENDING
+₹48,000
+
+EXPECTED
+₹72,000
+
+THIS MONTH
+₹31,500
+
+Additional metrics:
+
+Active Clients
+Active Projects
+Overdue Payments
+Recurring Monthly Revenue
+Payments received this month
+Payments expected this month
+Revenue Chart
+
+Interactive line/bar chart:
+
+Revenue
+  │
+₹50k       ╭──╮
+₹40k   ╭──╮│  │
+₹30k ╭─╯  ╰╯  ╰─╮
+₹20k │           ╰
+     └──────────────
+      Apr May Jun Jul Aug
+
+Filters:
+
+7 Days
+30 Days
+3 Months
+6 Months
+1 Year
+All Time
+5. Upcoming Payments
+
+Dashboard section:
+
+UPCOMING
+
+ABC Technologies
+₹15,000
+Due Sep 01
+2 days left
+
+XYZ Client
+₹5,000
+Due Sep 05
+6 days left
+
+Color/status should communicate urgency without making the UI look like a casino.
+
+6. Recent Transactions
+
+Example:
+
+RECENT TRANSACTIONS
+
++ ₹10,000
+ABC Technologies
+Advance
+HDFC •••• 4821
+Today, 4:32 PM
+
++ ₹5,000
+XYZ Client
+Monthly Payment
+SBI •••• 9132
+Yesterday
+7. Clients Screen
+
+Searchable client list.
+
+Each client card:
+
+ABC Technologies
+
+Falcon Android App
+
+₹50,000 Total
+₹35,000 Received
+₹15,000 Pending
+
+PARTIALLY PAID
+
+Filters:
+
+All
+Active
+Paid
+Pending
+Overdue
+Archived
+
+Search by:
+
+Client name
+Company
+Email
+Project
+Phone
+Tags
+8. Client Details
+
+When opening a client:
+
+Header
+ABC Technologies
+Active Client
+
+Total Billed
+₹50,000
+
+Received
+₹35,000
+
+Pending
+₹15,000
+
+Tabs:
+
+Overview
+Projects
+Payments
+Timeline
+Notes
+Files
+Overview
+
+Show:
+
+Total billed
+Total received
+Total pending
+Payment completion %
+Last payment
+Next payment
+Active projects
+Timeline
+Today
+₹10,000 received
+
+Aug 20
+₹15,000 received
+
+Aug 15
+Project created
+
+Aug 10
+₹10,000 advance received
+9. Add Client
+
+Fields:
+
+Client Name *
+Company
+Email
+Phone
+Telegram / WhatsApp
+Country
+Currency
+Notes
+Tags
+
+Optional:
+
+Client address
+Tax ID
+Website
+Internal notes
+
+Don't force unnecessary information.
+
+10. Projects
+
+A client can have multiple projects.
+
+Example:
+
+ABC Technologies
+
+Projects
+
+Falcon Android App
+₹50,000
+₹35,000 received
+₹15,000 pending
+
+Website
+₹25,000
+₹25,000 received
+COMPLETED
+11. Create Project
+
+Fields:
+
+Project Name *
+Client *
+Description
+
+Total Amount *
+Currency
+
+Start Date
+Expected Completion
+
+Payment Model
+
+Payment model options:
+
+One-Time
+Advance + Final
+Installments
+Monthly Recurring
+Custom Schedule
+12. Payment Schedule Builder
+
+This should be one of the nicest screens.
+
+For example:
+
+PROJECT VALUE
+₹50,000
+
+PAYMENT PLAN
+
+01
+Advance
+₹15,000
+Due immediately
+
+02
+Milestone
+₹20,000
+Due Sep 10
+
+03
+Final
+₹15,000
+Due Oct 01
+
+────────────────
+
+Scheduled: ₹50,000
+Remaining: ₹50,000
+
+The user can add/remove/reorder payment milestones.
+
+13. Add Payment
+
+This is the most important action in the app.
+
+Fields
+Client *
+Project
+
+Amount *
+Payment Date *
+
+Payment Type
+
+Payment types:
+
+Advance
+Milestone
+Final
+Monthly
+Installment
+Other
+Payment Method
+Bank Transfer
+UPI
+Cash
+Card
+PayPal
+Wise
+SWIFT
+Other
+Received Into
+HDFC Bank •••• 4821
+SBI •••• 9132
+Cash
+Other
+Additional
+Transaction ID
+Reference Number
+Notes
+Receipt/Screenshot
+
+Button:
+
+RECORD PAYMENT
+
+14. Payment History
+
+Full transaction ledger.
+
+Columns/cards:
+
+Date
+Client
+Project
+Amount
+Payment Type
+Method
+Account
+Status
+
+Filters:
+
+Date
+Client
+Project
+Bank
+Payment Type
+Payment Method
+Status
+
+Sorting:
+
+Newest
+Oldest
+Highest Amount
+Lowest Amount
+15. Bank Accounts
+
+Screen:
+
+BANK ACCOUNTS
+
+HDFC Bank
+•••• 4821
+₹72,500 received
+
+SBI
+•••• 9132
+₹31,000 received
+
++ Add Account
+
+Account fields:
+
+Account Name *
+Bank Name *
+Account Holder
+Account Number
+IFSC
+Currency
+Notes
+Security rule
+
+The UI should never display the full account number after saving.
+
+Display:
+
+•••• •••• 4821
+
+Sensitive account information should be encrypted at rest.
+
+16. Bank Account Details
+
+Show:
+
+HDFC Bank
+•••• 4821
+
+Total Received
+₹72,500
+
+Transactions
+24
+
+Last Transaction
+₹10,000
+Aug 27
+
+Transaction history:
+
++₹10,000  ABC Technologies
++₹5,000   XYZ
++₹15,000  Client C
+
+Important distinction:
+
+Tracked received amount ≠ live bank balance.
+
+Unless you later integrate a legitimate banking/open-banking provider, the app should not pretend it knows the actual bank balance.
+
+17. Recurring Payments
+
+Dedicated screen:
+
+RECURRING PAYMENTS
+
+XYZ Client
+
+₹5,000 / month
+
+Next payment
+01 Sep 2026
+
+Status
+ACTIVE
+
+Each recurring contract contains:
+
+Amount
+Frequency
+Start Date
+Next Due Date
+End Date / Never
+Client
+Project
+Bank Account (optional)
+
+Frequency:
+
+Weekly
+Monthly
+Quarterly
+Yearly
+Custom
+
+When a recurring payment becomes due, the system generates a payment schedule entry.
+
+It should not automatically mark it as received.
+
+18. Overdue System
+
+If:
+
+Due Date < Today
+AND
+Payment not fully received
+
+status becomes:
+
+OVERDUE
+
+Example:
+
+ABC Technologies
+
+₹15,000
+
+Due:
+Aug 20
+
+Today:
+Aug 27
+
+OVERDUE BY 7 DAYS
+
+Dashboard:
+
+⚠ ₹27,500 overdue
+19. Notifications
+
+Local notifications:
+
+Payment due tomorrow
+
+ABC Technologies
+₹15,000
+Due tomorrow
+
+Overdue:
+
+Payment overdue
+
+₹15,000 from ABC Technologies
+is 7 days overdue.
+
+Recurring:
+
+Monthly payment due
+
+XYZ Client
+₹5,000
+Due today.
+20. Analytics
+
+Analytics screen:
+
+Revenue
+Total revenue
+Monthly revenue
+Yearly revenue
+Average payment
+Receivables
+Total pending
+Total overdue
+Expected this month
+Expected next month
+Client analytics
+Highest-paying clients
+Most active clients
+Outstanding by client
+Bank analytics
+HDFC
+₹72,500
+
+SBI
+₹31,000
+
+Other
+₹8,000
+Payment-type analytics
+Advance       30%
+Monthly       40%
+Final         20%
+Installment   10%
+21. Cash Flow Forecast
+
+This is a killer feature.
+
+Show expected money:
+
+NEXT 30 DAYS
+
+Aug 29
++₹10,000
+
+Sep 01
++₹15,000
+
+Sep 05
++₹5,000
+
+Sep 10
++₹20,000
+
+────────────────
+Expected
+₹50,000
+
+Separate:
+
+Expected vs Actually Received
+
+Never mix the two.
+
+22. Calendar
+
+Monthly calendar:
+
+AUGUST 2026
+
+24   25   26   27   28   29   30
+          ●         ●
+
+31   1    2    3    4
+     ₹15k
+
+Tap a date → show:
+
+Payments due
+Payments received
+Overdue items
+23. Files / Receipts
+
+Each payment can have attachments:
+
+Payment screenshot
+Invoice
+Receipt
+Contract
+Proof of payment
+
+Store them securely.
+
+Users can open attachments from the payment details screen.
+
+24. Notes
+
+Client-specific notes:
+
+Client Notes
+
+Prefers Telegram
+Usually pays around 1st of month
+Final payment after delivery
+
+Keep internal notes separate from client-facing information.
+
+25. Settings
+
+Sections:
+
+Profile
+Name
+Email
+Avatar
+Currency
+INR
+USD
+SGD
+NZD
+etc.
+Notifications
+Payment reminders
+Overdue alerts
+Recurring payment alerts
+Security
+App lock
+Biometric unlock
+Session management
+Data
+Export CSV
+Export JSON
+Backup
+Restore
+Delete account
+Appearance
+Dark
+Light
+System
+26. Database Schema
+
+Use Supabase PostgreSQL.
+
+users / profiles
+profiles
+---------
+id UUID PRIMARY KEY
+full_name TEXT
+email TEXT
+avatar_url TEXT
+default_currency TEXT DEFAULT 'INR'
+timezone TEXT DEFAULT 'Asia/Kolkata'
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+clients
+clients
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+name TEXT NOT NULL
+company_name TEXT
+email TEXT
+phone TEXT
+telegram TEXT
+whatsapp TEXT
+country TEXT
+currency TEXT DEFAULT 'INR'
+notes TEXT
+status TEXT DEFAULT 'active'
+tags TEXT[]
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+projects
+projects
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+client_id UUID NOT NULL
+name TEXT NOT NULL
+description TEXT
+total_amount NUMERIC(14,2) NOT NULL
+currency TEXT DEFAULT 'INR'
+payment_model TEXT NOT NULL
+status TEXT DEFAULT 'active'
+start_date DATE
+expected_completion_date DATE
+completed_at TIMESTAMPTZ
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+payment_schedules
+payment_schedules
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+project_id UUID NOT NULL
+client_id UUID NOT NULL
+
+title TEXT
+amount NUMERIC(14,2) NOT NULL
+currency TEXT DEFAULT 'INR'
+
+due_date DATE NOT NULL
+
+payment_type TEXT
+status TEXT DEFAULT 'pending'
+
+recurrence_type TEXT
+recurrence_interval INTEGER
+
+parent_schedule_id UUID
+
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+payments
+payments
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+client_id UUID NOT NULL
+project_id UUID
+
+schedule_id UUID
+
+amount NUMERIC(14,2) NOT NULL
+currency TEXT DEFAULT 'INR'
+
+payment_date TIMESTAMPTZ NOT NULL
+
+payment_type TEXT
+payment_method TEXT
+
+bank_account_id UUID
+
+transaction_reference TEXT
+notes TEXT
+
+status TEXT DEFAULT 'received'
+
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+bank_accounts
+bank_accounts
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+
+account_name TEXT NOT NULL
+bank_name TEXT NOT NULL
+
+account_holder_name TEXT
+
+encrypted_account_number TEXT
+account_last4 TEXT
+
+encrypted_ifsc TEXT
+
+currency TEXT DEFAULT 'INR'
+
+is_active BOOLEAN DEFAULT TRUE
+
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+
+For a production deployment, don't casually store raw bank credentials.
+
+attachments
+attachments
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+
+payment_id UUID
+project_id UUID
+client_id UUID
+
+file_name TEXT NOT NULL
+storage_path TEXT NOT NULL
+mime_type TEXT
+file_size BIGINT
+
+created_at TIMESTAMPTZ
+
+Use Supabase Storage with private buckets.
+
+notifications
+notifications
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+
+type TEXT NOT NULL
+title TEXT NOT NULL
+message TEXT NOT NULL
+
+related_client_id UUID
+related_project_id UUID
+related_payment_id UUID
+
+scheduled_for TIMESTAMPTZ
+read_at TIMESTAMPTZ
+
+created_at TIMESTAMPTZ
+audit_logs
+
+I'd add this from day one.
+
+audit_logs
+---------
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+
+entity_type TEXT
+entity_id UUID
+action TEXT
+
+old_data JSONB
+new_data JSONB
+
+created_at TIMESTAMPTZ
+
+So if you accidentally change ₹50,000 to ₹5,000, you have a history.
+
+27. Database Relationships
+PROFILE
+ │
+ ├────────────── CLIENTS
+ │                  │
+ │                  └──── PROJECTS
+ │                          │
+ │                          └──── PAYMENT SCHEDULES
+ │                          │
+ │                          └──── PAYMENTS
+ │
+ ├────────────── BANK ACCOUNTS
+ │                  │
+ │                  └──── PAYMENTS
+ │
+ ├────────────── NOTIFICATIONS
+ │
+ ├────────────── ATTACHMENTS
+ │
+ └────────────── AUDIT LOGS
+
+Every business table must have user_id.
+
+Every query must be scoped to the authenticated user.
+
+28. Critical Calculation Logic
+
+Don't store calculated values like:
+
+pending_amount
+total_received
+monthly_revenue
+
+as manually editable values.
+
+Calculate them from transactions.
+
+Received
+SUM(successful payments)
+Project pending
+project.total_amount
+-
+SUM(received payments for project)
+Schedule remaining
+schedule.amount
+-
+SUM(payments linked to schedule)
+Overdue
+due_date < current_date
+AND remaining_amount > 0
+
+This prevents the classic finance-app nightmare where the dashboard says ₹40k pending while the client page says ₹35k. 💀
+
+29. Screen Architecture
+Splash
+   ↓
+Authentication
+   ├── Login
+   ├── Sign Up
+   └── Forgot Password
+
+Main App
+   │
+   ├── Dashboard
+   │
+   ├── Clients
+   │    ├── Client Details
+   │    ├── Projects
+   │    ├── Payments
+   │    └── Timeline
+   │
+   ├── Payments
+   │    ├── All Payments
+   │    └── Payment Details
+   │
+   ├── Recurring
+   │
+   ├── Calendar
+   │
+   ├── Analytics
+   │
+   ├── Bank Accounts
+   │
+   └── Settings
+30. UI Design System
+
+This is where I'd make it feel like your app, not some boring accounting software.
+
+Visual direction
+
+Premium + futuristic + minimal + dark
+
+Not:
+
+"Tally but with gradients."
+
+Instead:
+
+Linear × Revolut × modern AI dashboard
+
+Colors
+
+Base:
+
+Background: near-black
+Surface: dark charcoal
+Cards: slightly elevated dark surface
+Primary: electric purple / violet
+Secondary: subtle blue-violet
+Success: restrained green
+Warning: amber
+Danger: red
+Text: white
+Secondary text: muted gray
+Components
+
+Use:
+
+Rounded cards
+Thin borders
+Subtle glass effect
+Soft elevation
+Smooth transitions
+Micro animations
+Large financial numbers
+Clean typography
+Minimal icons
+
+Avoid:
+
+Excessive gradients
+Huge glowing elements
+Too many colors
+Clutter
+Excessive glassmorphism
+Fake 3D effects
+31. Bottom Navigation
+
+For Android:
+
+┌───────────────────────────────┐
+│                               │
+│           CONTENT             │
+│                               │
+├───────────────────────────────┤
+│ Home  Clients  +  Payments  More │
+└───────────────────────────────┘
+
+The central + opens:
+
+Add Client
+Add Project
+Add Payment
+Add Recurring Payment
+Add Bank Account
+32. Tech Stack
+
+I'd build V1 with:
+
+Android
+
+Kotlin + Jetpack Compose
+
+Architecture
+Clean Architecture
+MVVM
+Repository Pattern
+Use Cases
+Dependency Injection
+Backend
+
+Supabase
+
+PostgreSQL
+Auth
+Storage
+Row Level Security
+Local
+
+Room
+
+For:
+
+Cached dashboard
+Recent transactions
+Offline reads
+Dependency Injection
+
+Hilt
+
+Navigation
+
+Jetpack Navigation Compose
+
+Charts
+
+A Compose-compatible chart library, isolated behind a chart component so it can be replaced later.
+
+Notifications
+
+Android notification system + WorkManager.
+
+33. Security Requirements
+
+This is a finance-related application, so security isn't optional.
+
+Implement:
+
+Supabase authentication
+Row Level Security
+User-scoped database queries
+Private storage buckets
+Secure file access
+Encrypted sensitive bank data
+No API keys inside the APK
+No service-role Supabase key in Android
+HTTPS only
+Biometric app lock
+Session expiration
+Audit logging
+Confirmation before destructive actions
+Soft-delete where appropriate
+
+Never expose:
+
+SUPABASE_SERVICE_ROLE_KEY
+
+to the Android client.
+
+34. Exact AI Coding Prompt
+
+Give this entire prompt to your coding AI/agent.
+
+You are a senior Android architect, Kotlin engineer, backend engineer, UI/UX designer, database architect, and QA engineer.
+
+Build a production-quality Android application called "ArcManager".
+
+ArcManager is a private client payment and receivables management application.
+
+IMPORTANT:
+This is NOT a banking application.
+It must NOT claim to know live bank balances unless a legitimate banking integration is explicitly implemented later.
+It is a bookkeeping and payment tracking application.
+
+==================================================
+PRODUCT GOAL
+==================================================
+
+The app allows one authenticated user to:
+
+1. Add clients.
+2. Create projects for clients.
+3. Define project values.
+4. Create one-time payment plans.
+5. Track advance payments.
+6. Track installments.
+7. Track milestone payments.
+8. Track final payments.
+9. Track monthly recurring payments.
+10. Record received payments.
+11. Track pending amounts.
+12. Track overdue payments.
+13. Associate received payments with personal bank accounts.
+14. Maintain complete payment history.
+15. Attach payment screenshots/receipts.
+16. Add notes.
+17. View financial analytics.
+18. View upcoming expected payments.
+19. View cash-flow forecasts.
+20. Receive local payment reminders.
+21. Export financial data.
+22. Secure the application with authentication and optional biometric lock.
+
+==================================================
+TECH STACK
+==================================================
+
+Android:
+- Kotlin
+- Jetpack Compose
+- Material 3
+- Navigation Compose
+- MVVM
+- Clean Architecture
+- Repository Pattern
+- Hilt
+- Coroutines
+- Flow
+- Room for local caching
+- WorkManager for scheduled background work
+
+Backend:
+- Supabase
+- PostgreSQL
+- Supabase Auth
+- Supabase Storage
+- Row Level Security
+
+Use a modular, maintainable architecture.
+
+Do not place business logic inside Composable functions.
+
+Do not place Supabase calls directly inside UI components.
+
+==================================================
+ARCHITECTURE
+==================================================
+
+Use:
+
+presentation/
+domain/
+data/
+core/
+
+Recommended structure:
+
+presentation/
+    navigation/
+    screens/
+    components/
+    theme/
+    viewmodel/
+
+domain/
+    model/
+    repository/
+    usecase/
+
+data/
+    remote/
+    local/
+    repository/
+    mapper/
+
+core/
+    security/
+    notifications/
+    utilities/
+    validation/
+
+Every screen should have:
+- UI state
+- ViewModel
+- Events
+- Repository/use-case interaction
+
+Use immutable UI state.
+
+Use StateFlow.
+
+==================================================
+DATABASE
+==================================================
+
+Create the following PostgreSQL tables:
+
+profiles
+clients
+projects
+payment_schedules
+payments
+bank_accounts
+attachments
+notifications
+audit_logs
+
+Every user-owned table must contain:
+
+user_id UUID NOT NULL
+
+Use foreign keys.
+
+Enable Row Level Security on all user-owned tables.
+
+Users must only be able to access their own records.
+
+==================================================
+PROFILES
+==================================================
+
+profiles:
+
+id UUID PRIMARY KEY
+full_name TEXT
+email TEXT
+avatar_url TEXT
+default_currency TEXT DEFAULT 'INR'
+timezone TEXT DEFAULT 'Asia/Kolkata'
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+
+==================================================
+CLIENTS
+==================================================
+
+clients:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+name TEXT NOT NULL
+company_name TEXT
+email TEXT
+phone TEXT
+telegram TEXT
+whatsapp TEXT
+country TEXT
+currency TEXT DEFAULT 'INR'
+notes TEXT
+status TEXT DEFAULT 'active'
+tags TEXT[]
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+
+==================================================
+PROJECTS
+==================================================
+
+projects:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+client_id UUID NOT NULL
+name TEXT NOT NULL
+description TEXT
+total_amount NUMERIC(14,2) NOT NULL
+currency TEXT DEFAULT 'INR'
+payment_model TEXT NOT NULL
+status TEXT DEFAULT 'active'
+start_date DATE
+expected_completion_date DATE
+completed_at TIMESTAMPTZ
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+
+Payment models:
+
+ONE_TIME
+ADVANCE_FINAL
+INSTALLMENTS
+MONTHLY_RECURRING
+CUSTOM
+
+==================================================
+PAYMENT SCHEDULES
+==================================================
+
+payment_schedules:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+project_id UUID NOT NULL
+client_id UUID NOT NULL
+title TEXT
+amount NUMERIC(14,2) NOT NULL
+currency TEXT DEFAULT 'INR'
+due_date DATE NOT NULL
+payment_type TEXT
+status TEXT DEFAULT 'pending'
+recurrence_type TEXT
+recurrence_interval INTEGER
+parent_schedule_id UUID
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+
+Statuses:
+
+PENDING
+PARTIALLY_PAID
+PAID
+OVERDUE
+CANCELLED
+
+==================================================
+PAYMENTS
+==================================================
+
+payments:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+client_id UUID NOT NULL
+project_id UUID
+schedule_id UUID
+amount NUMERIC(14,2) NOT NULL
+currency TEXT DEFAULT 'INR'
+payment_date TIMESTAMPTZ NOT NULL
+payment_type TEXT
+payment_method TEXT
+bank_account_id UUID
+transaction_reference TEXT
+notes TEXT
+status TEXT DEFAULT 'received'
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+
+Payment types:
+
+ADVANCE
+MILESTONE
+INSTALLMENT
+FINAL
+MONTHLY
+OTHER
+
+Payment methods:
+
+BANK_TRANSFER
+UPI
+CASH
+CARD
+PAYPAL
+WISE
+SWIFT
+OTHER
+
+==================================================
+BANK ACCOUNTS
+==================================================
+
+bank_accounts:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+account_name TEXT NOT NULL
+bank_name TEXT NOT NULL
+account_holder_name TEXT
+encrypted_account_number TEXT
+account_last4 TEXT
+encrypted_ifsc TEXT
+currency TEXT DEFAULT 'INR'
+is_active BOOLEAN DEFAULT TRUE
+created_at TIMESTAMPTZ
+updated_at TIMESTAMPTZ
+
+IMPORTANT:
+Never display the complete account number after saving.
+Only show the last 4 digits.
+
+Sensitive account data must be encrypted.
+
+==================================================
+ATTACHMENTS
+==================================================
+
+attachments:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+payment_id UUID
+project_id UUID
+client_id UUID
+file_name TEXT NOT NULL
+storage_path TEXT NOT NULL
+mime_type TEXT
+file_size BIGINT
+created_at TIMESTAMPTZ
+
+Use private Supabase Storage buckets.
+
+==================================================
+NOTIFICATIONS
+==================================================
+
+notifications:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+type TEXT NOT NULL
+title TEXT NOT NULL
+message TEXT NOT NULL
+related_client_id UUID
+related_project_id UUID
+related_payment_id UUID
+scheduled_for TIMESTAMPTZ
+read_at TIMESTAMPTZ
+created_at TIMESTAMPTZ
+
+==================================================
+AUDIT LOGS
+==================================================
+
+audit_logs:
+
+id UUID PRIMARY KEY
+user_id UUID NOT NULL
+entity_type TEXT
+entity_id UUID
+action TEXT
+old_data JSONB
+new_data JSONB
+created_at TIMESTAMPTZ
+
+Log important create/update/delete operations.
+
+==================================================
+CRITICAL FINANCIAL LOGIC
+==================================================
+
+NEVER manually store calculated totals such as:
+
+pending_amount
+total_received
+monthly_revenue
+
+unless there is a very strong technical reason.
+
+Calculate them from payment records.
+
+Received:
+
+SUM(successful payments)
+
+Project pending:
+
+project.total_amount - SUM(successful payments belonging to project)
+
+Schedule remaining:
+
+schedule.amount - SUM(successful payments linked to schedule)
+
+Overdue:
+
+due_date < current date
+AND remaining amount > 0
+
+Make all calculations centralized in the domain layer or database views/functions.
+
+Avoid duplicated financial logic.
+
+Use NUMERIC/BigDecimal for money.
+
+NEVER use Float or Double for financial calculations.
+
+==================================================
+SCREENS
+==================================================
+
+Implement these screens:
+
+1. Splash
+2. Login
+3. Register
+4. Forgot Password
+5. Dashboard
+6. Clients
+7. Add Client
+8. Client Details
+9. Projects
+10. Create Project
+11. Payment Schedule Builder
+12. Payments
+13. Add Payment
+14. Payment Details
+15. Recurring Payments
+16. Recurring Payment Details
+17. Calendar
+18. Analytics
+19. Bank Accounts
+20. Add Bank Account
+21. Bank Account Details
+22. Notifications
+23. Search
+24. Files/Attachments
+25. Settings
+26. Profile
+27. Security
+28. Export/Backup
+
+==================================================
+DASHBOARD
+==================================================
+
+Create a premium financial dashboard.
+
+Show:
+
+Total Received
+Total Pending
+Expected This Month
+Received This Month
+Overdue
+Active Clients
+Active Projects
+Recurring Monthly Revenue
+
+Add:
+
+Revenue chart
+Upcoming payments
+Recent transactions
+Overdue payments
+
+Dashboard must load quickly.
+
+Use cached data when possible.
+
+Clearly distinguish:
+
+RECEIVED
+EXPECTED
+PENDING
+OVERDUE
+
+Never visually confuse expected money with received money.
+
+==================================================
+CLIENT SCREEN
+==================================================
+
+Show:
+
+Client name
+Company
+Total billed
+Total received
+Total pending
+Payment completion percentage
+Status
+
+Support:
+
+Search
+Filter
+Sort
+Archive
+Delete with confirmation
+
+==================================================
+CLIENT DETAILS
+==================================================
+
+Tabs:
+
+Overview
+Projects
+Payments
+Timeline
+Notes
+Files
+
+Show client-level financial summary.
+
+==================================================
+PROJECTS
+==================================================
+
+Each project must have:
+
+Client
+Name
+Description
+Total amount
+Currency
+Payment model
+Start date
+Expected completion
+Payment schedule
+Received
+Pending
+Completion percentage
+
+==================================================
+PAYMENT SCHEDULE BUILDER
+==================================================
+
+Create a visual schedule builder.
+
+Example:
+
+Advance
+₹15,000
+Due immediately
+
+Milestone
+₹20,000
+Due Sep 10
+
+Final
+₹15,000
+Due Oct 1
+
+Show:
+
+Scheduled total
+Received
+Remaining
+
+Prevent scheduled payment totals from accidentally exceeding project value unless explicitly allowed by the user.
+
+==================================================
+ADD PAYMENT
+==================================================
+
+Fields:
+
+Client
+Project
+Amount
+Payment date
+Payment type
+Payment method
+Received into bank account
+Transaction reference
+Notes
+Attachment
+
+Validate:
+
+Amount > 0
+Client exists
+Currency is valid
+Bank account belongs to authenticated user
+Project belongs to selected client
+
+After successful payment:
+
+Update all related calculations.
+Update schedule status.
+Update project status when appropriate.
+Create audit log.
+Show success state.
+Do not duplicate the payment if the user taps the button multiple times.
+
+Use idempotency where appropriate.
+
+==================================================
+BANK ACCOUNTS
+==================================================
+
+Users can add:
+
+Bank name
+Account nickname
+Account holder
+Account number
+IFSC
+Currency
+
+After saving:
+
+Display only:
+
+•••• 4821
+
+Never display the complete account number.
+
+Show:
+
+Total tracked received
+Transaction count
+Recent transactions
+
+IMPORTANT:
+This is NOT live bank balance.
+
+Label the value as:
+
+"Tracked Received"
+
+==================================================
+RECURRING PAYMENTS
+==================================================
+
+Support:
+
+Weekly
+Monthly
+Quarterly
+Yearly
+Custom
+
+Store recurrence configuration.
+
+Automatically generate upcoming payment schedule records.
+
+Do not automatically mark recurring payments as received.
+
+A recurring payment becomes received only after the user records the actual payment.
+
+==================================================
+OVERDUE SYSTEM
+==================================================
+
+Automatically determine overdue schedules.
+
+If:
+
+due_date < today
+AND remaining > 0
+
+mark/display:
+
+OVERDUE
+
+Show:
+
+Amount
+Client
+Project
+Original due date
+Days overdue
+
+==================================================
+CALENDAR
+==================================================
+
+Show:
+
+Upcoming payments
+Received payments
+Overdue payments
+
+Use clear visual indicators.
+
+Tap a date to see all related transactions/schedules.
+
+==================================================
+ANALYTICS
+==================================================
+
+Implement:
+
+Revenue by month
+Revenue by year
+Received vs pending
+Overdue amount
+Client revenue
+Bank account received amount
+Payment type distribution
+Recurring revenue
+Average payment amount
+
+Allow:
+
+7D
+30D
+3M
+6M
+1Y
+ALL
+
+==================================================
+CASH FLOW FORECAST
+==================================================
+
+Create a forecast screen.
+
+Show expected incoming payments by date.
+
+Example:
+
+Aug 29
+₹10,000
+
+Sep 1
+₹15,000
+
+Sep 5
+₹5,000
+
+Show:
+
+Expected next 7 days
+Expected next 30 days
+Expected next 90 days
+
+Clearly label these as EXPECTED, not RECEIVED.
+
+==================================================
+NOTIFICATIONS
+==================================================
+
+Use Android local notifications.
+
+Notify:
+
+1 day before due date.
+
+Notify when payment becomes overdue.
+
+Notify when recurring payment is due.
+
+Allow notification settings.
+
+Use WorkManager for scheduling.
+
+==================================================
+ATTACHMENTS
+==================================================
+
+Allow:
+
+Image picker
+Camera
+Document picker
+
+Upload securely to private Supabase Storage.
+
+Users must only access their own files.
+
+Show attachments in Payment Details.
+
+==================================================
+SEARCH
+==================================================
+
+Global search should find:
+
+Clients
+Projects
+Payments
+Transaction references
+Bank accounts
+
+Debounce search input.
+
+Show categorized results.
+
+==================================================
+UI/UX
+==================================================
+
+Design language:
+
+Premium
+Dark
+Futuristic
+Minimal
+Professional
+Financial dashboard aesthetic
+
+Reference the visual quality of:
+
+Linear
+Revolut
+modern fintech applications
+
+Do NOT copy any copyrighted UI.
+
+Use:
+
+Dark background
+Elevated cards
+Subtle borders
+Rounded corners
+Premium typography
+Clean icons
+Subtle violet/blue accent
+Smooth animations
+Excellent spacing
+
+Avoid:
+
+Excessive gradients
+Excessive glow
+Overly large animations
+Clutter
+Cheap-looking glassmorphism
+Too many colors
+
+Financial numbers should have strong visual hierarchy.
+
+==================================================
+UX RULES
+==================================================
+
+Every destructive action requires confirmation.
+
+Every network action needs:
+
+Loading
+Success
+Error
+Empty state
+
+Never show blank screens.
+
+Every list needs a proper empty state.
+
+Example:
+
+"No clients yet"
+
+"Add your first client to start tracking payments."
+
+Every form must have inline validation.
+
+Prevent accidental duplicate submissions.
+
+Use optimistic UI only where safe.
+
+==================================================
+OFFLINE
+==================================================
+
+Cache recent data using Room.
+
+If the network is unavailable:
+
+Show cached data.
+
+Allow safe local operations to be queued if feasible.
+
+Clearly show:
+
+Offline
+
+Do not pretend a payment was synced if it has not reached the backend.
+
+==================================================
+AUTHENTICATION
+==================================================
+
+Use Supabase Auth.
+
+Implement:
+
+Email/password
+Session persistence
+Logout
+Forgot password
+
+Do not expose sensitive backend credentials.
+
+==================================================
+SECURITY
+==================================================
+
+Implement:
+
+Supabase RLS
+User-scoped queries
+Private storage
+Encrypted sensitive bank information
+Biometric app lock
+Secure session handling
+Audit logs
+
+Never use the Supabase service-role key in Android.
+
+==================================================
+EXPORT
+==================================================
+
+Allow users to export:
+
+Clients
+Projects
+Payments
+Payment schedules
+Bank accounts metadata
+
+Formats:
+
+CSV
+JSON
+
+Do not export sensitive encrypted secrets in plaintext.
+
+==================================================
+ERROR HANDLING
+==================================================
+
+Create a consistent Result/Error architecture.
+
+Handle:
+
+Network errors
+Authentication errors
+Validation errors
+Database errors
+Storage errors
+Permission errors
+
+User-facing errors should be understandable.
+
+Do not expose raw stack traces.
+
+==================================================
+ACCESSIBILITY
+==================================================
+
+Support:
+
+Content descriptions
+Dynamic font scaling
+Sufficient contrast
+Touch targets
+Screen reader labels
+
+Do not communicate status only through color.
+
+==================================================
+PERFORMANCE
+==================================================
+
+Optimize:
+
+LazyColumn
+Paging where appropriate
+Database queries
+Supabase queries
+Image loading
+Chart rendering
+
+Avoid unnecessary recompositions.
+
+Do not perform heavy calculations on the main thread.
+
+==================================================
+IMPLEMENTATION ORDER
+==================================================
+
+Build in this order:
+
+PHASE 1
+Project setup
+Architecture
+Theme
+Navigation
+Supabase configuration
+
+PHASE 2
+Authentication
+
+PHASE 3
+Database migrations
+RLS policies
+Repositories
+Models
+
+PHASE 4
+Clients
+Projects
+
+PHASE 5
+Payment schedules
+Payments
+
+PHASE 6
+Bank accounts
+Attachments
+
+PHASE 7
+Recurring payments
+Overdue engine
+Notifications
+
+PHASE 8
+Dashboard
+Analytics
+Calendar
+Forecast
+
+PHASE 9
+Offline cache
+Export
+Security
+Audit logs
+
+PHASE 10
+Testing
+Performance
+Polish
+
+==================================================
+TESTING
+==================================================
+
+Write unit tests for:
+
+Payment calculations
+Pending calculations
+Schedule calculations
+Overdue calculations
+Recurring payment generation
+Currency handling
+Validation
+
+Write integration tests for:
+
+Authentication
+Client creation
+Project creation
+Payment recording
+Payment schedule updates
+Bank account association
+RLS
+
+UI tests for:
+
+Login
+Dashboard
+Add Client
+Add Payment
+Payment Details
+Recurring Payment
+Bank Account
+Settings
+
+==================================================
+IMPORTANT FINANCIAL EDGE CASES
+==================================================
+
+Handle:
+
+Partial payments
+Overpayments
+Cancelled schedules
+Deleted projects with payments
+Client with multiple projects
+Multiple currencies
+Recurring payment changes
+Payment corrections
+Duplicate payments
+Payment reversal
+Late payments
+Zero amounts
+Negative amounts
+Date/timezone issues
+
+Never silently delete financial history.
+
+For corrections, prefer creating adjustment/reversal records or using audit history.
+
+==================================================
+DELIVERABLES
+==================================================
+
+Produce:
+
+1. Complete Android project
+2. Supabase SQL migrations
+3. RLS policies
+4. Database functions/views if required
+5. Kotlin models
+6. Repositories
+7. Use cases
+8. ViewModels
+9. Compose UI
+10. Navigation
+11. Notifications
+12. Room cache
+13. Storage integration
+14. Authentication
+15. Tests
+16. README
+17. Setup instructions
+18. Environment variable documentation
+
+==================================================
+ENVIRONMENT VARIABLES
+==================================================
+
+Use placeholders:
+
+SUPABASE_URL
+SUPABASE_ANON_KEY
+
+Never hardcode secrets.
+
+==================================================
+DEVELOPMENT RULES
+==================================================
+
+DO NOT:
+
+- Create fake payment data as a substitute for real functionality.
+- Use mock repositories in production code.
+- Hardcode dashboard totals.
+- Hardcode client information.
+- Pretend bank balances are live.
+- Put Supabase service keys inside the app.
+- Put business logic inside Composables.
+- Use Double for financial calculations.
+- Skip RLS.
+- Skip validation.
+- Build only the UI and leave functionality mocked.
+
+Every button that exists in the UI must either work or be clearly marked as not implemented.
+
+Do not generate placeholder functionality and call it complete.
+
+==================================================
+AI AGENT BEHAVIOR
+==================================================
+
+Before coding:
+
+1. Inspect the entire project.
+2. Understand existing architecture.
+3. Identify existing files.
+4. Do not unnecessarily rewrite working code.
+5. Create a clear implementation plan.
+6. Implement one phase at a time.
+7. Compile after major changes.
+8. Fix errors immediately.
+9. Run tests.
+10. Verify navigation.
+11. Verify database queries.
+12. Verify RLS.
+13. Verify payment calculations.
+
+When encountering an error:
+
+- Read the actual error.
+- Identify root cause.
+- Fix the root cause.
+- Rebuild.
+- Do not hide errors with hacks.
+
+Do not ask unnecessary questions.
+
+Make sensible engineering decisions and continue.
+
+==================================================
+FINAL QUALITY BAR
+==================================================
+
+The finished application should feel like a real premium fintech product, not a generated CRUD demo.
+
+The most important requirements are:
+
+CORRECT MONEY
+SECURE DATA
+RELIABLE DATABASE
+REAL FUNCTIONALITY
+FAST UI
+CLEAN UX
+NO FAKE FEATURES
+NO HARDCODED FINANCIAL VALUES
+NO SECURITY SHORTCUTS
+
+Build the application completely and incrementally.
+35. One architectural change I'd make before you actually build it
+
+Bro, don't make the bank-account section imply that the app is reading your bank account.
+
+There are two completely different things:
+
+V1 — Payment tracking
+
+"₹10,000 received in HDFC ••••4821"
+
+This is something you manually record.
+
+V2 — Actual bank integration
+
+"₹10,000 automatically detected from HDFC"
+
+That requires a legitimate banking/open-banking integration and a much bigger security/compliance surface.
+
+For your first version, manual recording + excellent ledger is the right move.
+
+36. V1 Navigation I'd actually ship
+
+Don't overwhelm yourself with 15 tabs.
+
+Use:
+
+                    ArcManager
+
+HOME
+CLIENTS
+PAYMENTS
+RECURRING
+MORE
+
+MORE:
+
+Calendar
+Analytics
+Bank Accounts
+Notifications
+Files
+Settings
+
+And the floating/center:
+
+             +
+       Add Payment
+       Add Client
+       Add Project
+       Add Account
+
+That keeps the app clean instead of accounting-software ugly.
+
+And the most important screen is still Home: within 3 seconds, you should know how much you've received, how much is pending, what's overdue, and how much is expected next. That's the whole product's north star.
