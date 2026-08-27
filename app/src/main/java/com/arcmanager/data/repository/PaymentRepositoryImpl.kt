@@ -126,6 +126,21 @@ class PaymentRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun togglePaymentStatus(paymentId: String, newStatus: String): Result<Payment> {
+        return try {
+            val paymentRes = getPaymentById(paymentId)
+            if (paymentRes is Result.Error) return paymentRes
+            val payment = (paymentRes as Result.Success).data
+            val updated = payment.copy(status = newStatus)
+            val dto = updated.toDto()
+            supabase.postgrest[Constants.TABLE_PAYMENTS]
+                .update(dto) { filter { eq("id", paymentId); eq("user_id", userId) } }
+            Result.success(updated)
+        } catch (e: Exception) {
+            Result.error("Failed to update payment status: ${e.message}", e)
+        }
+    }
+
     override suspend fun deletePayment(paymentId: String): Result<Unit> {
         return try {
             supabase.postgrest[Constants.TABLE_PAYMENTS]

@@ -5,6 +5,7 @@ import com.arcmanager.core.util.Constants
 import com.arcmanager.core.util.Result
 import com.arcmanager.data.mapper.toDomain
 import com.arcmanager.data.mapper.toDto
+import com.arcmanager.data.remote.dto.PaymentDto
 import com.arcmanager.data.remote.dto.PaymentScheduleDto
 import com.arcmanager.domain.model.PaymentSchedule
 import com.arcmanager.domain.repository.PaymentScheduleRepository
@@ -15,6 +16,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.math.BigDecimal
+import java.time.Instant
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -144,6 +147,57 @@ class PaymentScheduleRepositoryImpl @Inject constructor(
             Result.success(schedule)
         } catch (e: Exception) {
             Result.error("Failed to update schedule: ${e.message}", e)
+        }
+    }
+
+    override suspend fun toggleScheduleReceived(scheduleId: String, markReceived: Boolean): Result<PaymentSchedule> {
+        return try {
+            val scheduleRes = getScheduleById(scheduleId)
+            if (scheduleRes is Result.Error) return scheduleRes
+            val schedule = (scheduleRes as Result.Success).data
+
+            val updatedSchedule = if (markReceived) {
+                schedule.copy(
+                    status = "paid",
+                    paidAmount = schedule.amount,
+                    remainingAmount = BigDecimal.ZERO,
+                    paidAt = Instant.now()
+                )
+            } else {
+                schedule.copy(
+                    status = "pending",
+                    paidAmount = BigDecimal.ZERO,
+                    remainingAmount = schedule.amount,
+                    paidAt = null
+                )
+            }
+
+            val dto = updatedSchedule.toDto()
+            supabase.postgrest[Constants.TABLE_PAYMENT_SCHEDULES]
+                .update(dto) { filter { eq("id", scheduleId); eq("user_id", userId) } }
+
+            if (markReceived) {
+                try {
+                    val paymentDto = PaymentDto(
+                        userId = userId,
+                        clientId = schedule.clientId,
+                        projectId = schedule.projectId,
+                        paymentScheduleId = schedule.id,
+                        amount = schedule.amount.toDouble(),
+                        currency = schedule.currency,
+                        paymentType = schedule.paymentType,
+                        paymentMethod = Constants.METHOD_BANK_TRANSFER,
+                        paymentDate = LocalDate.now().toString(),
+                        status = "received",
+                        notes = "Marked received for milestone: ${schedule.title ?: "Milestone"}"
+                    )
+                    supabase.postgrest[Constants.TABLE_PAYMENTS].insert(paymentDto)
+                } catch (e: Exception) { /* Ledger sync fallback */ }
+            }
+
+            Result.success(updatedSchedule)
+        } catch (e: Exception) {
+            Result.error("Failed to toggle received status: ${e.message}", e)
         }
     }
 

@@ -10,8 +10,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.*
@@ -490,5 +492,62 @@ fun FinancialMetricMini(
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
             color = color
         )
+    }
+}
+
+// ──────────────────────────────────────────────
+// 10. Interactive Payment Received Tick Toggle Button
+// ──────────────────────────────────────────────
+@Composable
+fun PaymentReceivedTickButton(
+    isReceived: Boolean,
+    onToggle: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    size: androidx.compose.ui.unit.Dp = 34.dp,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.85f else if (isReceived) 1.05f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+        label = "tick_scale"
+    )
+
+    Box(
+        modifier = modifier
+            .scale(scale)
+            .size(size)
+            .clip(CircleShape)
+            .background(
+                color = if (isReceived) StatusSuccessSubtle else Color(0x18FFFFFF),
+                shape = CircleShape
+            )
+            .border(
+                width = if (isReceived) 1.5.dp else 1.dp,
+                color = if (isReceived) StatusSuccessBright else Color(0x35FFFFFF),
+                shape = CircleShape
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = { onToggle(!isReceived) }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isReceived) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Payment Received",
+                tint = StatusSuccessBright,
+                modifier = Modifier.size(size * 0.58f)
+            )
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(size * 0.35f)
+                    .clip(CircleShape)
+                    .background(Color(0x35FFFFFF))
+            )
+        }
     }
 }

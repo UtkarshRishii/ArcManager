@@ -80,6 +80,16 @@ class PaymentCalendarViewModel @Inject constructor(
             }
         }
     }
+
+    fun toggleScheduleReceived(scheduleId: String, markReceived: Boolean) {
+        viewModelScope.launch {
+            when (scheduleRepository.toggleScheduleReceived(scheduleId, markReceived)) {
+                is Result.Success -> loadSchedules()
+                is Result.Error -> {}
+                is Result.Loading -> {}
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,7 +145,12 @@ fun PaymentCalendarScreen(
                             Text("OVERDUE", style = MaterialTheme.typography.labelSmall, color = StatusDangerBright)
                         }
                         items(uiState.overdueSchedules) { schedule ->
-                            ScheduleCalendarCard(schedule = schedule)
+                            ScheduleCalendarCard(
+                                schedule = schedule,
+                                onToggleReceived = { markReceived ->
+                                    viewModel.toggleScheduleReceived(schedule.id, markReceived)
+                                }
+                            )
                         }
                     }
 
@@ -144,7 +159,12 @@ fun PaymentCalendarScreen(
                             Text("UPCOMING MILESTONES", style = MaterialTheme.typography.labelSmall, color = TextTertiary)
                         }
                         items(uiState.upcomingSchedules) { schedule ->
-                            ScheduleCalendarCard(schedule = schedule)
+                            ScheduleCalendarCard(
+                                schedule = schedule,
+                                onToggleReceived = { markReceived ->
+                                    viewModel.toggleScheduleReceived(schedule.id, markReceived)
+                                }
+                            )
                         }
                     }
                 }
@@ -154,7 +174,10 @@ fun PaymentCalendarScreen(
 }
 
 @Composable
-private fun ScheduleCalendarCard(schedule: PaymentSchedule) {
+private fun ScheduleCalendarCard(
+    schedule: PaymentSchedule,
+    onToggleReceived: (Boolean) -> Unit,
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -169,17 +192,27 @@ private fun ScheduleCalendarCard(schedule: PaymentSchedule) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = schedule.title ?: "Milestone",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-                    color = TextPrimary
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                PaymentReceivedTickButton(
+                    isReceived = schedule.effectiveStatus == "paid",
+                    onToggle = onToggleReceived
                 )
-                Text(
-                    text = DateUtils.formatDueText(schedule.dueDate),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (schedule.isOverdue) StatusDanger else PrimaryVioletLight
-                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = schedule.title ?: "Milestone",
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = TextPrimary
+                    )
+                    Text(
+                        text = DateUtils.formatDueText(schedule.dueDate),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (schedule.isOverdue) StatusDanger else PrimaryVioletLight
+                    )
+                }
             }
             Column(horizontalAlignment = Alignment.End) {
                 Text(
@@ -187,6 +220,7 @@ private fun ScheduleCalendarCard(schedule: PaymentSchedule) {
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = TextPrimary
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 StatusBadge(status = schedule.effectiveStatus)
             }
         }

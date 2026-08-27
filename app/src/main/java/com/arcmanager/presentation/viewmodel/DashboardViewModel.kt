@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.arcmanager.core.util.Result
 import com.arcmanager.domain.model.User
 import com.arcmanager.domain.repository.AuthRepository
+import com.arcmanager.domain.repository.PaymentRepository
+import com.arcmanager.domain.repository.PaymentScheduleRepository
 import com.arcmanager.domain.usecase.DashboardOverview
 import com.arcmanager.domain.usecase.GetDashboardOverviewUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,6 +40,8 @@ data class DashboardUiState(
 class DashboardViewModel @Inject constructor(
     private val getDashboardOverviewUseCase: GetDashboardOverviewUseCase,
     private val authRepository: AuthRepository,
+    private val scheduleRepository: PaymentScheduleRepository,
+    private val paymentRepository: PaymentRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -66,6 +70,27 @@ class DashboardViewModel @Inject constructor(
                         it.copy(isLoading = false, error = result.message)
                     }
                 }
+            }
+        }
+    }
+
+    fun toggleScheduleReceived(scheduleId: String, markReceived: Boolean) {
+        viewModelScope.launch {
+            when (scheduleRepository.toggleScheduleReceived(scheduleId, markReceived)) {
+                is Result.Success -> loadDashboard()
+                is Result.Error -> {}
+                is Result.Loading -> {}
+            }
+        }
+    }
+
+    fun togglePaymentReceived(paymentId: String, markReceived: Boolean) {
+        viewModelScope.launch {
+            val newStatus = if (markReceived) "received" else "pending"
+            when (paymentRepository.togglePaymentStatus(paymentId, newStatus)) {
+                is Result.Success -> loadDashboard()
+                is Result.Error -> {}
+                is Result.Loading -> {}
             }
         }
     }

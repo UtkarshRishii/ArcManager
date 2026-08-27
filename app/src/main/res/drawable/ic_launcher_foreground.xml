@@ -4,14 +4,40 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- ArcManager 'A' Arc Symbol -->
+
+    <!-- Glowing Outer Arc Ring -->
+    <path
+        android:strokeWidth="5"
+        android:strokeColor="#8B5CF6"
+        android:strokeAlpha="0.85"
+        android:strokeLineCap="round"
+        android:pathData="M32,74 C26,58 34,36 54,32 C74,28 86,46 82,72" />
+
+    <!-- Radiant Inner Ascent Sweep -->
+    <path
+        android:strokeWidth="4"
+        android:strokeColor="#06B6D4"
+        android:strokeAlpha="0.9"
+        android:strokeLineCap="round"
+        android:pathData="M38,76 C34,62 40,46 54,42 C68,38 76,52 74,74" />
+
+    <!-- Geometric Finance Arc 'A' Emblem Core -->
     <path
         android:fillColor="#8B5CF6"
-        android:pathData="M54,28 L78,76 L66,76 L54,52 L42,76 L30,76 Z" />
+        android:pathData="M54,28 L72,74 L62,74 L54,52 L46,74 L36,74 Z" />
+
+    <!-- Radiant Center Light Bridge -->
     <path
-        android:fillColor="#A78BFA"
-        android:pathData="M44,62 L64,62 L60,54 L48,54 Z" />
+        android:fillColor="#C4B5FD"
+        android:pathData="M44,61 L64,61 L61,54 L47,54 Z" />
+
+    <!-- Central Diamond Glyph -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,34 L62,50 L46,50 Z" />
+        android:pathData="M54,35 L61,49 L47,49 Z" />
+
+    <!-- Top Apex Glowing Star Spark -->
+    <path
+        android:fillColor="#38BDF8"
+        android:pathData="M54,23 L56,27 L60,28 L56,29 L54,33 L52,29 L48,28 L52,27 Z" />
 </vector>

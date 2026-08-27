@@ -4,7 +4,6 @@ import com.arcmanager.core.util.Result
 import com.arcmanager.domain.model.Payment
 import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
-import java.time.Instant
 
 interface PaymentRepository {
     fun getAllPayments(): Flow<Result<List<Payment>>>
@@ -14,6 +13,7 @@ interface PaymentRepository {
     suspend fun getPaymentById(paymentId: String): Result<Payment>
     suspend fun recordPayment(payment: Payment): Result<Payment>
     suspend fun updatePayment(payment: Payment): Result<Payment>
+    suspend fun togglePaymentStatus(paymentId: String, newStatus: String): Result<Payment>
     suspend fun deletePayment(paymentId: String): Result<Unit>
 
     // Financial calculations — always derived from actual payment records

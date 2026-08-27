@@ -309,6 +309,9 @@ fun DashboardScreen(
                         navController.navigate(
                             Screen.AddPayment.createRoute(schedule.clientId, schedule.projectId)
                         )
+                    },
+                    onToggleReceived = { markReceived ->
+                        viewModel.toggleScheduleReceived(schedule.id, markReceived)
                     }
                 )
             }
@@ -398,6 +401,7 @@ private fun UpcomingPaymentLiquidCard(
     schedule: PaymentSchedule,
     currencyCode: String,
     onClick: () -> Unit,
+    onToggleReceived: (Boolean) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -427,18 +431,30 @@ private fun UpcomingPaymentLiquidCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = schedule.title ?: "Payment Due",
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-                    color = TextPrimary
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                PaymentReceivedTickButton(
+                    isReceived = schedule.effectiveStatus == "paid",
+                    onToggle = onToggleReceived
                 )
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = DateUtils.formatDueText(schedule.dueDate),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (schedule.isOverdue) StatusDangerBright else PrimaryVioletLight
-                )
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = schedule.title ?: "Payment Due",
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = TextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text(
+                        text = DateUtils.formatDueText(schedule.dueDate),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (schedule.isOverdue) StatusDangerBright else PrimaryVioletLight
+                    )
+                }
             }
 
             Column(horizontalAlignment = Alignment.End) {

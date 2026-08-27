@@ -4,15 +4,26 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- Deep Obsidian Canvas -->
     <path
-        android:fillColor="#07070B"
+        android:fillColor="#090912"
         android:pathData="M0,0h108v108h-108z" />
+
+    <!-- Ambient Violet Glow Orb -->
     <path
         android:fillColor="#8B5CF6"
-        android:fillAlpha="0.2"
-        android:pathData="M54,18 A36,36 0 1,0 54,90 A36,36 0 1,0 54,18 Z" />
+        android:fillAlpha="0.35"
+        android:pathData="M54,16 A38,38 0 1,0 54,92 A38,38 0 1,0 54,16 Z" />
+
+    <!-- Cyan Ambient Core Highlight -->
+    <path
+        android:fillColor="#06B6D4"
+        android:fillAlpha="0.22"
+        android:pathData="M38,32 A24,24 0 1,0 38,80 A24,24 0 1,0 38,32 Z" />
+
+    <!-- Deep Indigo Nebula Mesh -->
     <path
         android:fillColor="#6366F1"
-        android:fillAlpha="0.15"
-        android:pathData="M30,30 A24,24 0 1,0 30,78 A24,24 0 1,0 30,30 Z" />
+        android:fillAlpha="0.25"
+        android:pathData="M70,38 A22,22 0 1,0 70,82 A22,22 0 1,0 70,38 Z" />
 </vector>

@@ -116,7 +116,10 @@ fun PaymentsScreen(
                     items(uiState.filteredPayments, key = { it.id }) { payment ->
                         PaymentLedgerLiquidCard(
                             payment = payment,
-                            onClick = { onNavigateToPaymentDetail(payment.id) }
+                            onClick = { onNavigateToPaymentDetail(payment.id) },
+                            onToggleReceived = { isRec ->
+                                viewModel.togglePaymentReceived(payment.id, isRec)
+                            }
                         )
                     }
                 }
@@ -129,13 +132,14 @@ fun PaymentsScreen(
 private fun PaymentLedgerLiquidCard(
     payment: Payment,
     onClick: () -> Unit,
+    onToggleReceived: (Boolean) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
     Box(
         modifier = Modifier
-            .scale(if (isPressed) 0.97f else 1f)
+            .scale(if (isPressed) 0.98f else 1f)
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
             .background(Color(0x1818182A))
@@ -158,22 +162,14 @@ private fun PaymentLedgerLiquidCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(StatusSuccessSubtle)
-                        .border(1.dp, StatusSuccess.copy(alpha = 0.4f), RoundedCornerShape(14.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.ArrowDownward,
-                        contentDescription = "Received",
-                        tint = StatusSuccessBright,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                PaymentReceivedTickButton(
+                    isReceived = payment.status == "received",
+                    onToggle = onToggleReceived
+                )
 
                 Spacer(modifier = Modifier.width(14.dp))
 
@@ -193,9 +189,9 @@ private fun PaymentLedgerLiquidCard(
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "+ ${CurrencyUtils.formatAmount(payment.amount, payment.currency)}",
+                    text = (if (payment.status == "received") "+ " else "") + CurrencyUtils.formatAmount(payment.amount, payment.currency),
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = StatusSuccessBright
+                    color = if (payment.status == "received") StatusSuccessBright else StatusWarningBright
                 )
                 if (!payment.transactionReference.isNullOrBlank()) {
                     Text(

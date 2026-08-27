@@ -13,6 +13,7 @@ interface PaymentScheduleRepository {
     suspend fun createSchedule(schedule: PaymentSchedule): Result<PaymentSchedule>
     suspend fun createSchedules(schedules: List<PaymentSchedule>): Result<List<PaymentSchedule>>
     suspend fun updateSchedule(schedule: PaymentSchedule): Result<PaymentSchedule>
+    suspend fun toggleScheduleReceived(scheduleId: String, markReceived: Boolean): Result<PaymentSchedule>
     suspend fun deleteSchedule(scheduleId: String): Result<Unit>
     suspend fun deleteSchedulesByProject(projectId: String): Result<Unit>
 }

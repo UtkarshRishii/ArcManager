@@ -94,6 +94,16 @@ class ProjectDetailViewModel @Inject constructor(
             }
         }
     }
+
+    fun toggleScheduleReceived(scheduleId: String, markReceived: Boolean) {
+        viewModelScope.launch {
+            when (scheduleRepository.toggleScheduleReceived(scheduleId, markReceived)) {
+                is Result.Success -> loadProjectDetails()
+                is Result.Error -> {}
+                is Result.Loading -> {}
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -253,12 +263,25 @@ fun ProjectDetailScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column {
-                                Text(schedule.title ?: "Milestone", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), color = TextPrimary)
-                                Text("Due ${DateUtils.formatDisplayDate(schedule.dueDate)}", style = MaterialTheme.typography.bodySmall, color = if (schedule.isOverdue) StatusDanger else TextSecondary)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                PaymentReceivedTickButton(
+                                    isReceived = schedule.effectiveStatus == "paid",
+                                    onToggle = { markReceived ->
+                                        viewModel.toggleScheduleReceived(schedule.id, markReceived)
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(schedule.title ?: "Milestone", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold), color = TextPrimary)
+                                    Text("Due ${DateUtils.formatDisplayDate(schedule.dueDate)}", style = MaterialTheme.typography.bodySmall, color = if (schedule.isOverdue) StatusDanger else TextSecondary)
+                                }
                             }
                             Column(horizontalAlignment = Alignment.End) {
                                 Text(CurrencyUtils.formatAmount(schedule.amount, currency), style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = TextPrimary)
+                                Spacer(modifier = Modifier.height(2.dp))
                                 StatusBadge(status = schedule.effectiveStatus)
                             }
                         }

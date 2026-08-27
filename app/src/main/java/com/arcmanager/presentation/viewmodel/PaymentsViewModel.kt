@@ -61,6 +61,17 @@ class PaymentsViewModel @Inject constructor(
         }
     }
 
+    fun togglePaymentReceived(paymentId: String, markReceived: Boolean) {
+        viewModelScope.launch {
+            val newStatus = if (markReceived) "received" else "pending"
+            when (paymentRepository.togglePaymentStatus(paymentId, newStatus)) {
+                is Result.Success -> loadPayments()
+                is Result.Error -> {}
+                is Result.Loading -> {}
+            }
+        }
+    }
+
     fun onSearchQueryChange(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
         searchJob?.cancel()
@@ -86,17 +97,18 @@ class PaymentsViewModel @Inject constructor(
             val matchesQuery = query.isBlank() ||
                 payment.paymentType.displayName.contains(query, ignoreCase = true) ||
                 payment.paymentMethod.displayName.contains(query, ignoreCase = true) ||
-                (payment.transactionReference?.contains(query, ignoreCase = true) == true) ||
+                (payment.referenceNumber?.contains(query, ignoreCase = true) == true) ||
                 (payment.notes?.contains(query, ignoreCase = true) == true)
 
             val matchesFilter = when (filter) {
                 "All" -> true
-                "Advance" -> payment.paymentType.value == "ADVANCE"
-                "Milestone" -> payment.paymentType.value == "MILESTONE"
-                "Final" -> payment.paymentType.value == "FINAL"
-                "Monthly" -> payment.paymentType.value == "MONTHLY"
+                "Advance" -> payment.paymentType.name == "ADVANCE"
+                "Milestone" -> payment.paymentType.name == "MILESTONE"
+                "Final" -> payment.paymentType.name == "FINAL"
+                "Monthly" -> payment.paymentType.name == "MONTHLY"
                 else -> true
             }
+
             matchesQuery && matchesFilter
         }
     }
