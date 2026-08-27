@@ -42,7 +42,7 @@ class AuthViewModel @Inject constructor(
         checkSession()
     }
 
-    private fun checkSession() {
+    fun checkSession() {
         viewModelScope.launch {
             val loggedIn = authRepository.isLoggedIn()
             if (loggedIn) {

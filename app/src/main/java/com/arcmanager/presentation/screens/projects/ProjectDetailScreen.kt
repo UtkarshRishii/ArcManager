@@ -110,7 +110,7 @@ fun ProjectDetailScreen(
     val currency = project?.currency ?: "INR"
 
     androidx.compose.runtime.LaunchedEffect(projectId) {
-        viewModel.loadProject()
+        viewModel.loadProjectDetails()
     }
 
     if (uiState.isLoading || project == null) {

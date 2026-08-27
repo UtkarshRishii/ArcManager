@@ -132,7 +132,7 @@ fun ClientDetailScreen(
     val client = uiState.client
 
     androidx.compose.runtime.LaunchedEffect(clientId) {
-        viewModel.loadClient()
+        viewModel.loadClientDetails()
     }
 
     if (uiState.isLoading || client == null) {
