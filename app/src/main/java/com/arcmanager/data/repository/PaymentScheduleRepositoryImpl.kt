@@ -156,20 +156,12 @@ class PaymentScheduleRepositoryImpl @Inject constructor(
             if (scheduleRes is Result.Error) return scheduleRes
             val schedule = (scheduleRes as Result.Success).data
 
-            val updatedSchedule = if (markReceived) {
-                schedule.copy(
-                    status = "paid",
-                    paidAmount = schedule.amount,
-                    remainingAmount = BigDecimal.ZERO,
-                    paidAt = Instant.now()
-                )
+            val newStatus = if (markReceived) "paid" else "pending"
+            val updatedSchedule = schedule.copy(status = newStatus)
+            if (markReceived) {
+                updatedSchedule.paidAmount = schedule.amount
             } else {
-                schedule.copy(
-                    status = "pending",
-                    paidAmount = BigDecimal.ZERO,
-                    remainingAmount = schedule.amount,
-                    paidAt = null
-                )
+                updatedSchedule.paidAmount = BigDecimal.ZERO
             }
 
             val dto = updatedSchedule.toDto()
@@ -182,7 +174,7 @@ class PaymentScheduleRepositoryImpl @Inject constructor(
                         userId = userId,
                         clientId = schedule.clientId,
                         projectId = schedule.projectId,
-                        paymentScheduleId = schedule.id,
+                        scheduleId = schedule.id,
                         amount = schedule.amount.toDouble(),
                         currency = schedule.currency,
                         paymentType = schedule.paymentType,

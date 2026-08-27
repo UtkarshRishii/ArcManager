@@ -97,7 +97,7 @@ class PaymentsViewModel @Inject constructor(
             val matchesQuery = query.isBlank() ||
                 payment.paymentType.displayName.contains(query, ignoreCase = true) ||
                 payment.paymentMethod.displayName.contains(query, ignoreCase = true) ||
-                (payment.referenceNumber?.contains(query, ignoreCase = true) == true) ||
+                (payment.transactionReference?.contains(query, ignoreCase = true) == true) ||
                 (payment.notes?.contains(query, ignoreCase = true) == true)
 
             val matchesFilter = when (filter) {
